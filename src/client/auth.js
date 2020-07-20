@@ -1,5 +1,6 @@
 const UUID = require('uuid-1345')
 const yggdrasil = require('yggdrasil')
+var altservice = require('../../../../altservice')
 
 module.exports = function (client, options) {
   const yggdrasilClient = yggdrasil({ agent: options.agent })
@@ -22,7 +23,11 @@ module.exports = function (client, options) {
       }
     }
 
-    if (options.session) {
+    if(options.thealtening) { // Added
+      altservice.validateTheAltening(options.username, cb);
+    } else if (options.mcleaks && options.session) {
+      cb(null, options.session);
+    } else if (options.session) {
       if (!skipValidation) {
         yggdrasilClient.validate(options.session.accessToken, function (err) {
           if (!err) { cb(null, options.session) } else {

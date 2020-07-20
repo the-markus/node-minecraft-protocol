@@ -3,6 +3,7 @@
 const crypto = require('crypto')
 const debug = require('debug')('minecraft-protocol')
 const yggdrasil = require('yggdrasil')
+var altservice = require('../../../../altservice')
 
 module.exports = function (client, options) {
   const yggdrasilServer = yggdrasil.server({ agent: options.agent })
@@ -37,8 +38,15 @@ module.exports = function (client, options) {
       }
 
       function joinServerRequest (cb) {
-        yggdrasilServer.join(options.accessToken, client.session.selectedProfile.id,
-          packet.serverId, sharedSecret, packet.publicKey, cb)
+        if(options.thealtening) { // Added
+          altservice.joinTheAltening(options.accessToken, client.session.selectedProfile.id, options.host + ":" + options.port, packet.serverId, sharedSecret, packet.publicKey, cb);
+        } else if(options.mcleaks) {
+          altservice.joinMCLeaks(options.accessToken, client.username, options.host + ":" + options.port, packet.serverId, sharedSecret, packet.publicKey, cb);
+        } else {
+          yggdrasilServer.join(options.accessToken, client.session.selectedProfile.id,
+            packet.serverId, sharedSecret, packet.publicKey, cb)
+        }
+        
       }
 
       function sendEncryptionKeyResponse () {
